@@ -2,7 +2,7 @@
 SRC_DIR := .
 BIN_DIR := bin
 PACKAGE := com/psociety/lox
-MAIN_FILE := $(SRC_DIR)/$(PACKAGE)/lox.java
+MAIN_FILE := $(SRC_DIR)/$(PACKAGE)/Lox.java
 MAIN_CLASS := com.psociety.lox.lox
 JAVAC := javac
 JAVA := java

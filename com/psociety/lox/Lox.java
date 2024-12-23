@@ -11,6 +11,7 @@ import java.util.*;
 public class Lox {
 
     static boolean hadError = false;
+
     public static void main(String[] args) throws IOException {
 
         if (args.length > 1) {
@@ -26,18 +27,21 @@ public class Lox {
     private static void runFile(String path) throws IOException {
         byte[] bytes = Files.readAllBytes(Paths.get(path));
         run(new String(bytes, Charset.defaultCharset()));
-        if (hadError) System.exit(65);
+        if (hadError) {
+            System.exit(65);
+        }
     }
 
     private static void runPrompt() throws IOException {
+        System.out.println("Here!");
         InputStreamReader input = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input);
-
         for (;;) {
             System.out.print("> ");
             String line = reader.readLine();
-            if (line == null)
+            if (line == null) {
                 break;
+            }
             run(line);
             hadError = false;
         }
@@ -61,6 +65,6 @@ public class Lox {
         System.err.println(
                 "[line" + line + "] Error" + where + ": " + message);
 
-                hadError = true;
+        hadError = true;
     }
 }

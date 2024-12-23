@@ -106,6 +106,7 @@ public class Scanner {
 
             case '\n':
                 this.line++;
+                this.addToken(NEWLINE);
                 break;
             case '"':
                 string();
@@ -127,7 +128,15 @@ public class Scanner {
             this.advance();
         }
 
-        addToken(IDENTIFIER);
+        String text = source.substring(start, current);
+        TokenType type = keywords.get(text);
+
+        // agar kw nahi - tabh identifier
+        if (type == null) {
+            type = IDENTIFIER;
+        }
+
+        addToken(type);
     }
 
     private boolean isDigit(char c) {
