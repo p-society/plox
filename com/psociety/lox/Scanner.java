@@ -26,11 +26,11 @@ public class Scanner {
     }
 
     private boolean isAtEnd() {
-        return current >= source.length();
+        return this.current >= source.length();
     }
 
     private char advance() {
-        return source.charAt(current++);
+        return source.charAt(this.current++);
     }
 
     private void addToken(TokenType type) {
@@ -38,7 +38,7 @@ public class Scanner {
     }
 
     private void addToken(TokenType type, Object literal) {
-        String text = source.substring(start, current);
+        String text = source.substring(start, this.current);
         tokens.add(new Token(type, text, literal, line));
     }
 
@@ -89,15 +89,29 @@ public class Scanner {
                 break;
             case '/':
                 if (match('/')) {
-                    while (peek() != '\n' &&
-                            !this.isAtEnd()) {
-                        this.advance();
+                    // Single-line comment
+                    while (peek() != '\n' && !isAtEnd()) {
+                        advance();
+                    }
+                } else if (peek() == '*') { // Detect multi-line comment
+                    advance(); // Consume '*'
+                    while (!isAtEnd()) {
+                        if (peek() == '*' && peekNext() == '/') {
+                            advance(); // Consume '*'
+                            advance(); // Consume '/'
+                            break;
+                        }
+                        if (peek() == '\n')
+                            line++; // Track line numbers
+                        advance();
+                    }
+                    if (isAtEnd()) {
+                        Lox.error(line, "Unterminated comment.");
                     }
                 } else {
-                    this.addToken(SLASH);
+                    addToken(SLASH);
                 }
                 break;
-
             // Ignore whitespace.
             case ' ':
             case '\r':
@@ -106,7 +120,6 @@ public class Scanner {
 
             case '\n':
                 this.line++;
-                this.addToken(NEWLINE);
                 break;
             case '"':
                 string();
@@ -121,6 +134,7 @@ public class Scanner {
                 }
                 break;
         }
+
     }
 
     private void identifier() {
@@ -128,7 +142,7 @@ public class Scanner {
             this.advance();
         }
 
-        String text = source.substring(start, current);
+        String text = source.substring(start, this.current);
         TokenType type = keywords.get(text);
 
         // agar kw nahi - tabh identifier
@@ -158,7 +172,7 @@ public class Scanner {
         }
 
         this.addToken(NUMBER,
-                Double.parseDouble(source.substring(start, current)));
+                Double.parseDouble(source.substring(start, this.current)));
     }
 
     private void string() {
@@ -177,7 +191,7 @@ public class Scanner {
         // closing "
         this.advance();
 
-        String value = source.substring(start + 1, current - 1);
+        String value = source.substring(start + 1, this.current - 1);
         addToken(STRING, value);
     }
 
@@ -186,7 +200,7 @@ public class Scanner {
             return false;
         }
 
-        if (this.source.charAt(current) != expected) {
+        if (this.source.charAt(this.current) != expected) {
             return false;
         }
 
@@ -199,15 +213,15 @@ public class Scanner {
         if (isAtEnd()) {
             return '\0';
         }
-        return this.source.charAt(current);
+        return this.source.charAt(this.current);
     }
 
     // lookahead - 2character
     private char peekNext() {
         if (this.current + 1 >= source.length()) {
-            return '\0';
+            return '\0'; // mast move hai yeh !!!
         }
-        return source.charAt(current + 1);
+        return source.charAt(this.current + 1);
     }
 
     private boolean isAlpha(char c) {
